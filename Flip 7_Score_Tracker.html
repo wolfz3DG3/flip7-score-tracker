@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Flip 7 Score Tracker</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: 'Bangers', cursive;
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        h1 {
+            font-size: 80px;
+            letter-spacing: 3px;
+            color: #ffe006;
+            text-shadow:
+                3px 3px 0 #7a00cc,
+                6px 6px 0 #ff4fd8;
+        }
+
+        button {
+            background-color: #ff4fd8;
+            color: black;
+            font-family: 'Bangers', cursive;
+            font-size: 35px;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            background-color: green;
+        }
+
+        #newGameButton {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            padding: 10px 20px;
+        }
+
+        input {
+            font-family: 'Bangers', cursive;
+            font-size: 24px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 3px solid #ff4fd8;
+            background-color: black;
+            color: #ffe006;
+            text-align: center;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #7a00cc;
+            box-shadow: 0 0 15px #ff4fd8;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            appearance: textfield;
+        }
+
+        #playerList {
+            position: absolute;
+            left: 40px;
+            top: 180px;
+            text-align: left;
+            font-size: 24px;
+            color: #ffe006;
+        }
+
+        table {
+            margin: 40px auto;
+            border-collapse: collapse;
+            color: white;
+            font-size: 22px;
+        }
+
+        th {
+            color: #ffe006;
+            font-size: 32px;
+            padding: 15px;
+        }
+
+        td {
+            border: 2px solid #ff4fd8;
+            padding: 15px;
+        }
+
+        td input {
+            width: 80px;
+            font-size: 18px;
+        }
+
+        td button {
+            font-size: 18px;
+            padding: 8px 15px;
+        }
+
+        #finalResults {
+            margin-top: 40px;
+            font-size: 32px;
+            color: #ffe006;
+        }
+
+        #finalResults h2 {
+            font-size: 60px;
+            color: #ff4fd8;
+        }
+
+        #finalResults table {
+            margin: 20px auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <button id="newGameButton" onclick="newGame()">New Game</button>
+
+    <h1>Flip 7 Score Tracker</h1>
+
+    <button id="startButton" onclick="startGame()">Start Game</button>
+
+    <br><br>
+
+    <div id="playerCountSection">
+        <label>Number of Players (3-18):</label>
+        <br><br>
+        <input type="number" id="playerCount">
+    </div>
+
+    <p id="message"></p>
+
+    <div id="nameSection" style="display: none;">
+        <label id="nameLabel">Player 1 Name:</label>
+        <br><br>
+        <input type="text" id="playerNameInput">
+        <button onclick="setPlayerName()">Set</button>
+        <button onclick="undoPlayerName()">Undo</button>
+    </div>
+
+    <div id="playerList"></div>
+
+    <div id="scoreTable"></div>
+
+    <div id="finalResults"></div>
+
+    <script>
+        let totalPlayers = 0;
+        let currentPlayer = 1;
+        let currentRound = 1;
+
+        let playerNames = [];
+        let playerTotals = [];
+        let roundScores = [];
+
+        function startGame() {
+            let players = document.getElementById("playerCount").value;
+
+            if (players < 3) {
+                document.getElementById("message").innerText =
+                    "Not enough players!";
+            } else if (players > 18) {
+                document.getElementById("message").innerText =
+                    "Too many players!";
+            } else {
+                totalPlayers = Number(players);
+
+                document.getElementById("message").innerText =
+                    "Enter player names:";
+
+                document.getElementById("startButton").style.display =
+                    "none";
+
+                document.getElementById("playerCountSection").style.display =
+                    "none";
+
+                document.getElementById("nameSection").style.display =
+                    "block";
+
+                document.getElementById("nameLabel").innerText =
+                    "Player 1 Name:";
+            }
+        }
+
+        function setPlayerName() {
+            let name = document.getElementById("playerNameInput").value.trim();
+
+            if (name === "") {
+                document.getElementById("message").innerText =
+                    "Please enter a valid name!";
+                return;
+            }
+
+            playerNames.push(name);
+
+            updatePlayerList();
+
+            document.getElementById("playerNameInput").value = "";
+
+            currentPlayer++;
+
+            if (currentPlayer <= totalPlayers) {
+                document.getElementById("nameLabel").innerText =
+                    "Player " + currentPlayer + " Name:";
+            } else {
+                document.getElementById("nameSection").style.display =
+                    "none";
+
+                document.getElementById("playerList").style.display =
+                    "none";
+
+                document.getElementById("message").innerText =
+                    "Round 1 started!";
+
+                playerTotals = new Array(totalPlayers).fill(0);
+
+                roundScores = [
+                    new Array(totalPlayers).fill(null)
+                ];
+
+                showScoreTable();
+            }
+        }
+
+        function updatePlayerList() {
+            let listHTML = "";
+
+            for (let i = 0; i < playerNames.length; i++) {
+                listHTML += `<p>${i + 1}. ${playerNames[i]}</p>`;
+            }
+
+            document.getElementById("playerList").innerHTML = listHTML;
+        }
+
+        function undoPlayerName() {
+            if (playerNames.length === 0) {
+                document.getElementById("message").innerText =
+                    "No player names to undo!";
+                return;
+            }
+
+            playerNames.pop();
+
+            currentPlayer--;
+
+            document.getElementById("nameLabel").innerText =
+                "Player " + currentPlayer + " Name:";
+
+            updatePlayerList();
+
+            document.getElementById("message").innerText =
+                "Last player name removed.";
+        }
+
+        function showScoreTable() {
+            let tableHTML = `
+                <table>
+                    <tr>
+                        <th>Player</th>
+            `;
+
+            for (let round = 1; round <= currentRound; round++) {
+                tableHTML += `<th>Round ${round}</th>`;
+            }
+
+            tableHTML += `<th>Total</th></tr>`;
+
+            for (let i = 0; i < playerNames.length; i++) {
+                tableHTML += `
+                    <tr>
+                        <td>${playerNames[i]}</td>
+                `;
+
+                for (let round = 0; round < currentRound; round++) {
+                    let score = roundScores[round][i];
+
+                    if (score === null) {
+                        tableHTML += `
+                            <td>
+                                <input type="number" id="score-${round}-${i}">
+                                <button onclick="setScore(${round}, ${i})">Set</button>
+                            </td>
+                        `;
+                    } else {
+                        tableHTML += `
+                            <td>
+                                ${score}
+                                <button onclick="resetScore(${round}, ${i})">
+                                    Reset
+                                </button>
+                            </td>
+                        `;
+                    }
+                }
+
+                tableHTML += `<td>${playerTotals[i]}</td></tr>`;
+            }
+
+            tableHTML += `</table>`;
+
+            document.getElementById("scoreTable").innerHTML = tableHTML;
+        }
+
+        function setScore(roundIndex, playerIndex) {
+            let scoreInput =
+                document.getElementById("score-" + roundIndex + "-" + playerIndex);
+
+            let score = Number(scoreInput.value);
+
+            if (scoreInput.value === "") {
+                document.getElementById("message").innerText =
+                    "Please enter a score!";
+                return;
+            }
+
+            roundScores[roundIndex][playerIndex] = score;
+
+            playerTotals[playerIndex] += score;
+
+            checkRoundComplete();
+
+            showScoreTable();
+        }
+
+        function checkRoundComplete() {
+            let roundComplete = true;
+
+            for (let i = 0; i < totalPlayers; i++) {
+                if (roundScores[currentRound - 1][i] === null) {
+                    roundComplete = false;
+                }
+            }
+
+            if (roundComplete) {
+                checkForWinner();
+
+                if (document.getElementById("finalResults").innerHTML !== "") {
+                    return;
+                }
+
+                currentRound++;
+
+                roundScores.push(
+                    new Array(totalPlayers).fill(null)
+                );
+
+                document.getElementById("message").innerText =
+                    "Round " + currentRound + " started!";
+            }
+        }
+
+        function checkForWinner() {
+            let highestScore = Math.max(...playerTotals);
+
+            if (highestScore < 200) {
+                return;
+            }
+
+            let winners = [];
+
+            for (let i = 0; i < playerTotals.length; i++) {
+                if (playerTotals[i] === highestScore) {
+                    winners.push(playerNames[i]);
+                }
+            }
+
+            let standings = [];
+
+            for (let i = 0; i < playerNames.length; i++) {
+                standings.push({
+                    name: playerNames[i],
+                    total: playerTotals[i]
+                });
+            }
+
+            standings.sort(function(a, b) {
+                return b.total - a.total;
+            });
+
+            let resultsHTML = "";
+
+            if (winners.length > 1) {
+                resultsHTML += `<h2>Tie Game!</h2>`;
+                resultsHTML += `<p>${winners.join(" and ")} tied with ${highestScore} points!</p>`;
+            } else {
+                resultsHTML += `<h2>${winners[0]} Wins!</h2>`;
+                resultsHTML += `<p>Final score: ${highestScore}</p>`;
+            }
+
+            resultsHTML += `
+                <table>
+                    <tr>
+                        <th>Place</th>
+                        <th>Player</th>
+                        <th>Total</th>
+                    </tr>
+            `;
+
+            for (let i = 0; i < standings.length; i++) {
+                resultsHTML += `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>${standings[i].name}</td>
+                        <td>${standings[i].total}</td>
+                    </tr>
+                `;
+            }
+
+            resultsHTML += `</table>`;
+
+            document.getElementById("scoreTable").style.display = "none";
+            document.getElementById("message").innerText = "Game Over!";
+            document.getElementById("finalResults").innerHTML = resultsHTML;
+        }
+
+        function resetScore(roundIndex, playerIndex) {
+            let oldScore = roundScores[roundIndex][playerIndex];
+
+            if (oldScore !== null) {
+                playerTotals[playerIndex] -= oldScore;
+                roundScores[roundIndex][playerIndex] = null;
+            }
+
+            document.getElementById("message").innerText =
+                "Score reset. Re-enter the score.";
+
+            showScoreTable();
+        }
+
+        function newGame() {
+            totalPlayers = 0;
+            currentPlayer = 1;
+            currentRound = 1;
+
+            playerNames = [];
+            playerTotals = [];
+            roundScores = [];
+
+            document.getElementById("playerCount").value = "";
+            document.getElementById("playerNameInput").value = "";
+
+            document.getElementById("message").innerText = "";
+            document.getElementById("playerList").innerHTML = "";
+            document.getElementById("scoreTable").innerHTML = "";
+            document.getElementById("finalResults").innerHTML = "";
+
+            document.getElementById("startButton").style.display =
+                "inline-block";
+
+            document.getElementById("playerCountSection").style.display =
+                "block";
+
+            document.getElementById("nameSection").style.display =
+                "none";
+
+            document.getElementById("playerList").style.display =
+                "block";
+
+            document.getElementById("scoreTable").style.display =
+                "block";
+        }
+
+        document.addEventListener("wheel", function(event) {
+            if (document.activeElement.type === "number") {
+                document.activeElement.blur();
+            }
+        });
+    </script>
+
+</body>
+
+</html>
