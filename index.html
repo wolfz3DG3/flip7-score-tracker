@@ -115,7 +115,7 @@
         #finalResults table { margin: 20px auto; border-collapse: collapse; width: min(100%, 600px); }
         #finalResults th { padding: 12px; }
         #finalResults td { border: 2px solid #ff4fd8; padding: 12px; overflow-wrap: anywhere; }
-        #highScoresDialog {
+        dialog {
             width: min(720px, calc(100% - 24px));
             max-height: calc(100dvh - 32px);
             padding: 20px;
@@ -124,7 +124,7 @@
             background: #160d1c;
             color: white;
         }
-        #highScoresDialog::backdrop { background: rgb(0 0 0 / 80%); }
+        dialog::backdrop { background: rgb(0 0 0 / 80%); }
         .dialog-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
         .dialog-heading h2 { margin: 0; color: #ffe006; font-size: 36px; }
         .dialog-heading button { padding: 8px 12px; font-size: 22px; }
@@ -134,8 +134,43 @@
         #highScoresList th, #highScoresList td { padding: 10px 6px; border-bottom: 1px solid #643355; overflow-wrap: anywhere; }
         #highScoresList th:first-child { width: 12%; }
         #highScoresList th:nth-child(3) { width: 18%; }
-        #highScoresList th:last-child { width: 35%; }
+        #highScoresList th:nth-child(4) { width: 30%; }
+        #highScoresList th:last-child { width: 16%; }
         #highScoresList time { font-family: system-ui, sans-serif; font-size: 14px; }
+        .delete-high-score, #undoHighScoreButton { font-size: 18px; padding: 10px 8px; }
+        .player-select {
+            width: 100%; height: 100%; padding: 8px; background: transparent;
+            color: #ffe006; text-align: left; border-radius: 8px;
+            display: flex; flex-direction: column; justify-content: center; gap: 6px;
+        }
+        .player-select:hover { background: #321440; }
+        .player-select:focus-visible { outline-offset: -4px; }
+        .player-score-state { font-size: 14px; color: #ffb9ed; }
+        .player-select.is-saved { box-shadow: inset 0 0 0 1px #ffe006; }
+        .player-select.is-saved .player-score-state { color: #ffe006; }
+        body.game-active {
+            height: 100dvh; overflow: hidden; display: flex; flex-direction: column;
+            padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
+                max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+        }
+        .game-active header { flex-shrink: 0; margin: 0; }
+        .game-active h1 { font-size: 26px; margin: 8px 0; letter-spacing: 1px; text-shadow: 2px 2px 0 #7a00cc; }
+        .game-active .header-actions button { font-size: 20px; min-height: 44px; padding: 8px 14px; }
+        .game-active #message { flex-shrink: 0; font-size: 16px; margin: 0 0 6px; }
+        .game-active #playerList { width: 100%; flex: 1; min-height: 0; margin: 0 auto; gap: 6px; }
+        .game-active .player-column { display: grid; grid-template-rows: repeat(var(--player-rows, 6), minmax(0, 1fr)); gap: 6px; }
+        .game-active .player-card { min-height: 0; padding: 0; overflow: hidden; }
+        .game-active .player-heading { width: 100%; min-height: 0; align-items: center; }
+        .game-active .player-name { font-size: 20px; line-height: 1.1; min-height: 0; }
+        .game-active .player-total { font-size: 30px; }
+        .game-active .player-total small { display: none; }
+        #scoreEditorTitle { overflow-wrap: anywhere; min-width: 0; }
+        #scoreEditorTotal { color: #ffe006; font-size: 24px; }
+        #scoreEditorMessage { color: #ffe006; font-family: system-ui, sans-serif; font-size: 14px; }
+        #winnerDialog #finalResults { margin: 16px 0; }
+        #winnerDialog #finalResults h2 { font-size: 36px; margin: 12px 0; }
+        #winnerDialog #finalResults p { margin: 12px 0; }
+        #winnerDialog #finalResults table { font-size: 20px; }
         @media (max-width: 600px) {
             body { padding: 12px; }
             #playerList { gap: 8px; }
@@ -146,6 +181,31 @@
             .score-controls { flex-wrap: wrap; gap: 6px; }
             .score-controls button { width: 100%; }
             .score-form label, .round-history summary { font-size: 16px; }
+            .game-active .player-heading { flex-direction: column; align-items: flex-start; gap: 4px; flex: 1; }
+            .game-active .player-name { font-size: 16px; width: 100%; flex: 1; display: flex; align-items: center; }
+            .game-active .player-total { font-size: 26px; }
+            .game-active .player-select { padding: 6px; gap: 4px; }
+            .game-active .player-score-state { font-size: 12px; }
+            dialog { padding: 14px; }
+            .dialog-heading h2 { font-size: 28px; }
+            #highScoresList thead { display: none; }
+            #highScoresList table, #highScoresList tbody { display: block; }
+            #highScoresList tr { display: grid; grid-template-columns: 24px minmax(0, 1fr) 52px 60px; border-bottom: 1px solid #643355; padding: 8px 0; align-items: center; }
+            #highScoresList td { border: 0; padding: 4px; }
+            #highScoresList td:nth-child(4) { grid-column: 2 / 4; grid-row: 2; text-align: left; }
+            #highScoresList td:last-child { grid-column: 4; grid-row: 1 / 3; }
+        }
+        @media (max-height: 700px) {
+            .game-active h1 { font-size: 22px; margin: 4px 0; }
+            .game-active .player-score-state { display: none; }
+        }
+        @media (max-height: 450px) {
+            .game-active h1 { display: none; }
+            .game-active .player-select { padding: 3px 6px; gap: 2px; }
+            .game-active .player-heading { flex-direction: row; align-items: center; }
+            .game-active .player-name { font-size: 14px; }
+            .game-active .player-total { font-size: 22px; }
+            .game-active .player-score-state { font-size: 11px; }
         }
     </style>
 </head>
@@ -170,7 +230,23 @@
         <button onclick="undoPlayerName()">Undo</button>
     </div>
     <div id="playerList" aria-label="Players and total scores"></div>
-    <div id="finalResults"></div>
+    <dialog id="scoreEditorDialog" aria-labelledby="scoreEditorTitle">
+        <div class="dialog-heading">
+            <h2 id="scoreEditorTitle">Player score</h2>
+            <button type="button" onclick="closeScoreEditor()">Close</button>
+        </div>
+        <p id="scoreEditorTotal"></p>
+        <div id="scoreEditorFields"></div>
+        <p id="scoreEditorMessage" role="status"></p>
+    </dialog>
+    <dialog id="winnerDialog" aria-labelledby="winnerTitle">
+        <div class="dialog-heading">
+            <h2 id="winnerTitle">Game Results</h2>
+            <form method="dialog"><button autofocus>Close</button></form>
+        </div>
+        <div id="finalResults"></div>
+        <button type="button" onclick="newGame()">New Game</button>
+    </dialog>
     <dialog id="highScoresDialog" aria-labelledby="highScoresTitle">
         <div class="dialog-heading">
             <h2 id="highScoresTitle">Top 10 Hi Scores</h2>
@@ -178,6 +254,8 @@
         </div>
         <p class="high-score-note">The ten highest winning scores, saved in this browser. Tied winners each get a spot.</p>
         <div id="highScoresList"></div>
+        <p id="highScoreDeleteMessage" class="high-score-note" role="status"></p>
+        <button id="undoHighScoreButton" type="button" onclick="undoDeleteHighScore()" hidden>Undo delete</button>
         <p id="highScoreStorageMessage" class="high-score-note" role="status"></p>
     </dialog>
     <script>
@@ -193,6 +271,10 @@
         let previousHighScores = highScores.slice();
         let gameId = createGameId();
         let wonAt = null;
+        let editingPlayer = null;
+        const scoreDrafts = new Map();
+        const deletedHighScoreKeys = new Set();
+        let lastDeletedHighScore = null;
 
         function createGameId() {
             return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -234,7 +316,12 @@
                 gameId, playerIndex: i, name: playerNames[i], score: playerTotals[i], wonAt
             }));
             // Rebuild this game's entries after corrections, including restoring displaced older scores.
-            highScores = sortHighScores([...previousHighScores, ...winningEntries]);
+            highScores = sortHighScores([...previousHighScores, ...winningEntries]
+                .filter(entry => !deletedHighScoreKeys.has(highScoreKey(entry))));
+            persistHighScores();
+        }
+
+        function persistHighScores() {
             try {
                 localStorage.setItem(highScoresStorageKey, JSON.stringify(highScores));
                 highScoreStorageAvailable = true;
@@ -244,14 +331,44 @@
             renderHighScores();
         }
 
+        function highScoreKey(entry) {
+            return JSON.stringify([entry.gameId, entry.playerIndex ?? entry.name, entry.wonAt]);
+        }
+
+        function deleteHighScore(index) {
+            const entry = highScores[index];
+            if (!entry) return;
+            lastDeletedHighScore = entry;
+            deletedHighScoreKeys.add(highScoreKey(entry));
+            highScores.splice(index, 1);
+            document.getElementById("highScoreDeleteMessage").innerText = `Deleted ${entry.name}'s ${entry.score}-point entry.`;
+            document.getElementById("undoHighScoreButton").hidden = false;
+            persistHighScores();
+        }
+
+        function undoDeleteHighScore() {
+            if (!lastDeletedHighScore) return;
+            deletedHighScoreKeys.delete(highScoreKey(lastDeletedHighScore));
+            if (lastDeletedHighScore.gameId !== gameId && !previousHighScores.some(entry => highScoreKey(entry) === highScoreKey(lastDeletedHighScore))) {
+                previousHighScores.push(lastDeletedHighScore);
+            }
+            highScores = sortHighScores([...highScores, lastDeletedHighScore]);
+            lastDeletedHighScore = null;
+            document.getElementById("highScoreDeleteMessage").innerText = "Entry restored.";
+            document.getElementById("undoHighScoreButton").hidden = true;
+            persistHighScores();
+        }
+
         function renderHighScores() {
             let html = '<p>No winning scores yet. Finish a game to record your first hi score!</p>';
             if (highScores.length > 0) {
-                html = '<table><thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col">Score</th><th scope="col">Won on</th></tr></thead><tbody>';
+                html = '<table><thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col">Score</th><th scope="col">Won on</th><th scope="col">Delete</th></tr></thead><tbody>';
                 highScores.forEach((entry, i) => {
                     const date = new Date(entry.wonAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
                     html += `<tr><td>${i + 1}</td><td>${escapeHTML(entry.name)}</td><td>${entry.score}</td>
-                        <td><time datetime="${escapeHTML(entry.wonAt)}">${escapeHTML(date)}</time></td></tr>`;
+                        <td><time datetime="${escapeHTML(entry.wonAt)}">${escapeHTML(date)}</time></td>
+                        <td><button class="delete-high-score" type="button" onclick="deleteHighScore(${i})"
+                            aria-label="Delete ${escapeHTML(entry.name)}'s ${entry.score}-point hi score">Delete</button></td></tr>`;
                 });
                 html += '</tbody></table>';
             }
@@ -304,6 +421,9 @@
                 document.getElementById("nameSection").style.display = "none";
                 document.getElementById("message").innerText = "Round 1 started!";
                 roundScores = [new Array(totalPlayers).fill(null)];
+                document.getElementById("playerNameInput").blur();
+                document.body.classList.add("game-active");
+                window.scrollTo(0, 0);
             }
             updatePlayerList();
         }
@@ -328,7 +448,7 @@
                 <form class="score-form" onsubmit="setScore(${roundIndex}, ${playerIndex}); return false;">
                     <label for="${inputId}">Round ${roundIndex + 1} score${score === null ? '' : ' (saved)'}</label>
                     <div class="score-controls">
-                        <input class="score-input" type="number" id="${inputId}" min="0" step="1"
+                        <input class="score-input" type="number" inputmode="numeric" id="${inputId}" min="0" step="1"
                             aria-label="${escapeHTML(playerNames[playerIndex])}, round ${roundIndex + 1} score"
                             value="${score === null ? '' : score}" placeholder="Score" required>
                         <button type="submit">${score === null ? 'Set' : 'Update'}</button>
@@ -338,50 +458,94 @@
 
         function updatePlayerList() {
             const board = document.getElementById("playerList");
-            // Keep unsaved entries and expanded histories when another player's score is saved.
-            const drafts = new Map(Array.from(board.querySelectorAll('.score-input'), input => [input.id, input.value]));
-            const openHistories = new Set(Array.from(board.querySelectorAll('details[open]'), details => details.id));
             const rankedPlayers = rankedPlayerIndices();
             board.style.setProperty('--player-columns', Math.max(1, Math.ceil(playerNames.length / 6)));
+            board.style.setProperty('--player-rows', Math.min(6, playerNames.length));
             let listHTML = "";
             for (let first = 0; first < playerNames.length; first += 6) {
                 listHTML += '<div class="player-column">';
                 for (let position = first; position < Math.min(first + 6, playerNames.length); position++) {
                     const i = rankedPlayers[position];
+                    const playing = roundScores.length > 0;
+                    const score = playing ? roundScores[currentRound - 1][i] : null;
                     listHTML += `
                         <article class="player-card">
-                            <h2 class="player-heading">
+                            ${playing ? `<button type="button" class="player-select ${score === null ? '' : 'is-saved'}"
+                                onclick="openScoreEditor(${i})" aria-label="${escapeHTML(playerNames[i])}, ${playerTotals[i]} total points. Enter or edit scores.">` : ''}
+                            <span class="player-heading">
                                 <span class="player-name">${position + 1}. ${escapeHTML(playerNames[i])}</span>
                                 <span class="player-total" aria-label="Total score: ${playerTotals[i]}">${playerTotals[i]} <small>pts</small></span>
-                            </h2>`;
-                    if (roundScores.length > 0) {
-                        listHTML += scoreForm(currentRound - 1, i);
-                        if (currentRound > 1) {
-                            listHTML += `<details class="round-history" id="history-${i}" ${openHistories.has(`history-${i}`) ? 'open' : ''}>
-                                <summary>Previous rounds (${currentRound - 1})</summary>`;
-                            for (let round = currentRound - 2; round >= 0; round--) {
-                                listHTML += scoreForm(round, i);
-                            }
-                            listHTML += '</details>';
-                        }
+                            </span>`;
+                    if (playing) {
+                        listHTML += `<span class="player-score-state">${score === null ? 'Tap to score' : `Saved: ${score}`}</span></button>`;
                     }
                     listHTML += '</article>';
                 }
                 listHTML += '</div>';
             }
             board.innerHTML = listHTML;
-            for (const input of board.querySelectorAll('.score-input')) {
-                if (drafts.has(input.id)) input.value = drafts.get(input.id);
+            if (roundScores.length > 0) {
+                const entered = roundScores[currentRound - 1].filter(score => score !== null).length;
+                document.getElementById("message").innerText = wonAt !== null
+                    ? "Game over · Tap a player to edit scores"
+                    : `Round ${currentRound} · ${entered}/${totalPlayers} scores saved · Tap a player`;
             }
+            requestAnimationFrame(fitPlayerNames);
+        }
+
+        function fitPlayerNames() {
+            if (!document.body.classList.contains("game-active")) return;
+            for (const name of document.querySelectorAll('.player-name')) {
+                name.style.fontSize = '';
+                let size = parseFloat(getComputedStyle(name).fontSize);
+                while (size > 8 && (name.scrollHeight > name.clientHeight || name.scrollWidth > name.clientWidth)) {
+                    name.style.fontSize = `${--size}px`;
+                }
+            }
+        }
+
+        function rememberScoreDrafts() {
+            for (const input of document.querySelectorAll('#scoreEditorFields .score-input')) {
+                scoreDrafts.set(input.id, input.value);
+            }
+        }
+
+        function openScoreEditor(playerIndex) {
+            editingPlayer = playerIndex;
+            document.getElementById("scoreEditorTitle").innerText = playerNames[playerIndex];
+            document.getElementById("scoreEditorTotal").innerText = `Total: ${playerTotals[playerIndex]} points`;
+            document.getElementById("scoreEditorMessage").innerText = "";
+            let html = scoreForm(currentRound - 1, playerIndex);
+            if (currentRound > 1) {
+                html += `<details class="round-history"><summary>Previous rounds (${currentRound - 1})</summary>`;
+                for (let round = currentRound - 2; round >= 0; round--) html += scoreForm(round, playerIndex);
+                html += '</details>';
+            }
+            document.getElementById("scoreEditorFields").innerHTML = html;
+            for (const input of document.querySelectorAll('#scoreEditorFields .score-input')) {
+                if (scoreDrafts.has(input.id)) input.value = scoreDrafts.get(input.id);
+            }
+            const dialog = document.getElementById("scoreEditorDialog");
+            dialog.showModal();
+            dialog.scrollTop = 0;
+            document.getElementById(`score-${currentRound - 1}-${playerIndex}`).focus();
+        }
+
+        function closeScoreEditor() {
+            rememberScoreDrafts();
+            document.activeElement.blur();
+            document.getElementById("scoreEditorDialog").close();
+            editingPlayer = null;
         }
 
         function setScore(roundIndex, playerIndex) {
             const scoreInput = document.getElementById(`score-${roundIndex}-${playerIndex}`);
             const score = Number(scoreInput.value);
             if (scoreInput.value.trim() === "" || !Number.isInteger(score) || score < 0) {
-                document.getElementById("message").innerText = "Please enter a whole-number score of 0 or more.";
+                document.getElementById("scoreEditorMessage").innerText = "Please enter a whole-number score of 0 or more.";
                 return;
             }
+            closeScoreEditor();
             roundScores[roundIndex][playerIndex] = score;
             // Editing a saved round replaces its score instead of adding it again.
             playerTotals = playerNames.map((_, i) => roundScores.reduce((total, round) => total + (round[i] ?? 0), 0));
@@ -394,6 +558,7 @@
             document.getElementById("finalResults").innerHTML = "";
             if (roundScores.some(round => round.some(score => score === null))) return;
             if (checkForWinner()) return;
+            document.getElementById("winnerDialog").close();
             if (wonAt !== null) syncWinningHighScores([]);
             currentRound++;
             roundScores.push(new Array(totalPlayers).fill(null));
@@ -416,10 +581,17 @@
             });
             document.getElementById("message").innerText = "Game Over! Saved scores can still be edited below each player's name.";
             document.getElementById("finalResults").innerHTML = resultsHTML + '</table>';
+            const dialog = document.getElementById("winnerDialog");
+            if (!dialog.open) dialog.showModal();
+            dialog.scrollTop = 0;
             return true;
         }
 
         function newGame() {
+            for (const dialog of document.querySelectorAll('dialog[open]')) dialog.close();
+            document.body.classList.remove("game-active");
+            editingPlayer = null;
+            scoreDrafts.clear();
             // Keep the saved leaderboard while beginning a fresh game.
             previousHighScores = highScores.slice();
             gameId = createGameId();
@@ -446,6 +618,12 @@
         document.addEventListener("wheel", () => {
             if (document.activeElement.type === "number") document.activeElement.blur();
         });
+        document.getElementById("scoreEditorDialog").addEventListener("cancel", event => {
+            event.preventDefault();
+            closeScoreEditor();
+        });
+        window.addEventListener("resize", fitPlayerNames);
+        document.fonts.ready.then(fitPlayerNames);
     </script>
 </body>
 </html>
